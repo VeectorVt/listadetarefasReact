@@ -1,18 +1,15 @@
 import React, { Component } from "react";
 
-// Form
-import { FaPlus } from 'react-icons/fa'
+import Form from "./Form";
+import Tarefas from "./Tarefas";
 
-// Tarefas
-import { FaEdit, FaWindowClose } from 'react-icons/fa'
+
 
 
 import "./Main.css"
 
 
 export default class Main extends Component {
-  // constructor(props){
-  //   super(props)
 
   //   this.state = {
   //     novaTarefa: '',
@@ -20,6 +17,25 @@ export default class Main extends Component {
 
   //   this.inputMudou = this.inputMudou.bind(this)
   // }
+
+
+  componentDidMount() {
+    const tarefas = JSON.parse(localStorage.getItem('tarefas'))
+    if (tarefas) {
+      this.setState({ tarefas })
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { tarefas } = this.state
+
+    // if (prevState.tarefas !== tarefas) {
+      localStorage.setItem('tarefas', JSON.stringify(tarefas));
+
+      // this.setState({ tarefas })
+    // }
+  }
+
 
 
   state = {
@@ -67,7 +83,10 @@ export default class Main extends Component {
         tarefas: [...novasTarefas, novaTarefaObj],
         novaTarefa: ''
       })
+
+      // localStorage.setItem('tarefas', JSON.stringify([...novasTarefas, novaTarefaObj]))
     } else {
+      // Minha lógica de Editar
       const updatedTarefas = [...tarefas];
       updatedTarefas[isEdit].tarefa = novaTarefa;
 
@@ -85,6 +104,7 @@ export default class Main extends Component {
         isEdit: null
       });
 
+      // localStorage.setItem('tarefas', JSON.stringify(updatedTarefas));
 
     }
 
@@ -102,39 +122,35 @@ export default class Main extends Component {
     const { tarefas } = this.state
     tarefas.splice(index, 1)
     this.setState({ tarefas })
+
+    // localStorage.setItem('tarefas', JSON.stringify(tarefas))
   }
 
   render() {
     const { novaTarefa, tarefas } = this.state
-
+    // useEffect(() => {
+    //   const tarefas = JSON.parse(localStorage.getItem('tarefas'))
+    //   if (tarefas) {
+    //     this.setState({ tarefas })
+    //   }
+    // }, [])
 
     return (
       <div className="main">
         <h1>Lista de Tarefas</h1>
 
-        <form onSubmit={this.handleSubmit} className="form">
-          <input onChange={this.handleChange} value={novaTarefa} type="text" />
-          <button type="submit"><FaPlus /></button>
+        <Form
 
-        </form>
+          handleSubmit={this.handleSubmit}
+          handleChange={this.handleChange}
+          tarefa={novaTarefa} />
 
-        <ul className="tarefas">
-          {tarefas.map((tarefa, index) => (
-            <li key={index}>
-              {tarefa.tarefa}
 
-              <div>
-                <FaEdit
-                  onClick={(e) => this.handleEdit(e, index)} className="edit" />
-                <FaWindowClose
-                  onClick={(e) => this.handleDelete(e, index)} className="delete" />
-              </div>
-
-            </li>
-          ))}
-
-        </ul>
-
+      <Tarefas 
+        tarefas={tarefas}
+        handleEdit={this.handleEdit}
+        handleDelete={this.handleDelete}
+      />
       </div>
     )
   }
